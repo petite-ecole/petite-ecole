@@ -18,12 +18,71 @@
     <meta data-n-head="ssr" name="twitter:card" content="summary_large_image">
     <title>Petite Ecole</title>
     <script>
-        location.replace('https://secure.wayforpay.com/donate/petite_ecole');
+        const findKey = (obj, predicate = o => o) => Object.keys(obj)
+            .find(key => predicate(obj[key], key, obj));
+
+        const BROWSER = {
+            messenger: /\bFB[\w_]+\/(Messenger|MESSENGER)/,
+            facebook: /\bFB[\w_]+\//,
+            twitter: /\bTwitter/i,
+            line: /\bLine\//i,
+            wechat: /\bMicroMessenger\//i,
+            puffin: /\bPuffin/i,
+            miui: /\bMiuiBrowser\//i,
+            instagram: /\bInstagram/i,
+            chrome: /\bCrMo\b|CriOS|Android.*Chrome\/[.0-9]* (Mobile)?/,
+            safari: /Version.*Mobile.*Safari|Safari.*Mobile|MobileSafari/,
+            ie: /IEMobile|MSIEMobile/,
+            firefox: /fennec|firefox.*maemo|(Mobile|Tablet).*Firefox|Firefox.*Mobile|FxiOS/,
+        };
+
+        class InApp {
+
+            ua = '';
+
+            constructor(useragent) {
+                this.ua = useragent;
+            }
+
+            get browser() {
+                return findKey(BROWSER, regex => regex.test(this.ua)) || 'other';
+            }
+
+            get isMobile() {
+                return /(iPad|iPhone|Android|Mobile)/i.test(this.ua) || false;
+            }
+
+            get isDesktop() {
+                return !this.isMobile;
+            }
+
+            get isInApp() {
+                const rules = [
+                    'WebView',
+                    '(iPhone|iPod|iPad)(?!.*Safari\/)',
+                    'Android.*(wv)',
+                ];
+                const regex = new RegExp(`(${rules.join('|')})`, 'ig');
+                return Boolean(this.ua.match(regex));
+            }
+        }
+        const useragent = navigator.userAgent || navigator.vendor || window.opera;
+        const inapp = new InApp(useragent);
+
     </script>
 </head>
 
 <body>
-    
+    <div id="txt"></div>
+    <script>
+        document.getElementById('txt').innerHTML = `ua: ${inapp.ua}; browser: ${inapp.browser}; desktop: ${inapp.isDesktop}; inApp ${inapp.isInApp}; isMobile: ${inapp.isMobile}`
+        console.log(inapp)
+        setInterval(() => {
+            console.log(1)
+        }, 1000)
+    </script>
+    <!-- window.open('https://secure.wayforpay.com/donate/petite_ecole', '_blank'); -->
+    <a href="https://secure.wayforpay.com/donate/petite_ecole" target="_blank">Hi</a>
 </body>
 
 </html>
